@@ -1,0 +1,239 @@
+\documentclass[russian,aspectratio=169,14pt]{beamer}
+
+\usetheme{ShipilevRH}
+
+\title{ООП. SOLID}
+\subtitle{Пишем поддерживаемый код}
+\author{Валерий Алексеевич Овчинников}
+\institute{valery.ovchinnikov@phystech.edu}
+
+\begin{document}
+
+\maketitle
+
+\section{Мотивация}
+
+\begin{frame}
+	\frametitle{Чего мы хотим от кода?}
+	\begin{enumerate}
+		\item Легко читать
+		\item Легко поддерживать
+		\item Легко расширять
+		\pause
+		\item High cohesion and loose coupling\\
+		Сильная связность при слабой связанности (запутанности)
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Зачем коду быть понятным?}
+	\begin{enumerate}
+		\item Код пишут один раз, а читают много
+		\pause
+		\item Не нужно читать документацию, чтобы разобраться
+		\pause
+		\item Проще искать ошибки
+		\pause
+		\item Проще менять и дополнять
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Зачем коду быть понятным?}
+	Что здесь происходит?
+	\vfill
+	\begin{listjava}
+double f(int a, int b) {
+	double y = b;
+	double z = 1;
+	while (a > 0) {
+		if (a % 2 == 1)
+			z *= y;
+		y = Math.pow(y, 2);
+		a /= 2;
+	}
+	return z;
+}
+	\end{listjava}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Зачем коду быть понятным?}
+	\begin{center}
+	\includegraphics[height=0.7\textheight]{wut.jpg}
+	\end{center}
+\end{frame}
+
+\begin{frame}[fragile]
+	\frametitle{Зачем коду быть понятным?}
+	Что здесь происходит?
+	\vfill
+	\begin{listjava}
+double fastPow(double base, int power) {
+    double result = 1;
+    while (power > 0) {
+        if (isOdd(power)) {
+            result *= base;
+        }
+        base = Math.pow(base, 2);
+        power /= 2;
+    }
+    return result;
+}
+	\end{listjava}
+\end{frame}
+
+\section{ООП}
+
+\begin{frame}
+	\frametitle{Записка на полях}
+	Интерфейс -- набор методов, через которые внешний мир может контактировать с объектом
+\end{frame}
+
+\begin{frame}
+	\begin{center}
+	\includegraphics[height=0.8\textheight]{3_words.jpeg}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Основные идеи}
+	\begin{enumerate}
+		\item Инкапсуляция
+		\item Наследование (типизация)
+		\item Полиморфизм
+		\item Абстракция
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Инкапсуляция}
+	\begin{itemize}
+		\item Сокрытие внутреннего устройства объекта
+		\item Контроль над изменением состояния объекта
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Наследование}
+	\begin{itemize}
+		\item Инструмент для создания иерархии типов, достижения полиморфизма
+		\item Позволяет переиспользовать код
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Полиморфизм}
+	\begin{itemize}
+		\item Позволяет работать с объектами разного типа через общий интерфейс
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Абстракция}
+	Чтобы всё вышеперечисленное работало, нужно правильно выбирать абстракции\\
+	Оставлять в интерфейсе только значимые общие элементы для всех объектов, реализующих этот интерфейс
+\end{frame}
+
+\section{SOLID}
+
+\begin{frame}
+	\frametitle{Расшифровка}
+	\begin{enumerate}
+		\item Single Responsibility Principle (SRP)\\
+		Принцип единственной обязанности (цели)
+		\item Open/Closed Principle (OCP)\\
+		Принцип открытости/закрытости интерфейсов
+		\item Liskov Substituition Principle (LSP)\\
+		Принцип подстановки Лисков
+		\item Interface Segregation Principle (ISP)\\
+		Принцип разделения интерфейсов
+		\item Dependency Inversion Principle (DIP)\\
+		Принцип инверсии зависимостей
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Принцип единственной обязанности (цели)}
+	\begin{minipage}{1.0\textwidth}
+	Каждый класс должен представлять одну сущность. Должна быть только одна причина, чтобы \textbf{менять} этот класс\\
+	Каждый метод должен делать одно какое-то действие\\
+	\end{minipage}
+	\begin{minipage}{1.0\textwidth}
+	Позволяет легко ориентироваться в коде и быстро понимать в каком компоненте ошибка\\
+	Легко заменить реализацию конкретного функционала
+	\end{minipage}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Принцип открытости/закрытости интерфейсов}
+	\begin{minipage}{1.0\textwidth}
+	Интерфейсы должны быть открыты для расширения, но закрыты для изменения\\
+	\end{minipage}
+	\begin{minipage}{1.0\textwidth}
+	Интерфейс это контракт, если меняется интерфейс, то ломается код, использующий его\\
+	Добавление новых методов в интерфейс не ломает существующий код, но расширяет возможности
+	\end{minipage}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Принцип подстановки Лисков}
+	\begin{minipage}{1.0\textwidth}
+	Если вместо объектов базового типа подставить объекты его подтипа, то код должен продолжать корректно работать\\
+	\end{minipage}
+	\begin{minipage}{1.0\textwidth}
+	Позволяет менять реализации, сохраняя интерфейс и не меняя остальной код
+	\end{minipage}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Принцип разделения интерфейсов}
+	\begin{minipage}{1.0\textwidth}
+	Лучше иметь много маленьких, специализированных интерфейсов, чем один всемогущий\\
+	Перекликается с SRP\\
+	\end{minipage}
+	\begin{minipage}{1.0\textwidth}
+	Помогает реализовать предыдущие принципы
+	\end{minipage}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Принцип инверсии зависимостей}
+	\begin{minipage}{1.0\textwidth}
+	Абстракции не должны зависеть от деталей, детали должны зависеть от абстракций\\
+	Иными словами на заданном уровне должен использоваться один и тот же уровень абстракции\\
+	\end{minipage}
+	\begin{minipage}{1.0\textwidth}
+	Помогает лучше выбирать абстракцию, сохранять инкапсуляцию, улучшает читаемость кода
+	\end{minipage}
+\end{frame}
+
+\section{Другие принципы}
+
+\begin{frame}
+	\frametitle{Tell, don't ask}
+	\begin{minipage}{1.0\textwidth}
+	Говорите объекту что нужно сделать, а не спрашивайте о его состоянии\\
+	Состояние класса не должно раскрываться даже через методы (например get/set)\\
+	Объект должен сам основываясь на своем состоянии совершать действия\\
+	\end{minipage}
+	\begin{minipage}{1.0\textwidth}
+	Обеспечивает логическую инкапсуляцию
+	\end{minipage}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Предпочитайте агрегацию наследованию}
+	\begin{minipage}{1.0\textwidth}
+	Лучше реализовать интерфейс расширяемого класса и завести в новом классе поле типа расширяемого класса, при необходимости вызывать нужные методы расширяемого класса\\
+	\end{minipage}
+	\begin{minipage}{1.0\textwidth}
+	Позволяет избегать глупых и неочевидных ошибок, строитб более правильную с точки зрения ООП иерархию типов
+	\end{minipage}
+\end{frame}
+
+
+
+\questions
+
+\end{document}
